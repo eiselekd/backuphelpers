@@ -1,12 +1,12 @@
 from PIL import Image
-from sortpics.meta import ImageMetaData
+from sortpics.meta import MetaFile
 from datetime import datetime
 from pprint import pprint
 from pyexiftool.exiftool import ExifTool
 import time, atexit
 
 
-class SortImage(ImageMetaData):
+class SortImage(MetaFile):
     
     et = ExifTool()
     et.start()
@@ -15,16 +15,23 @@ class SortImage(ImageMetaData):
     atexit.register(etclean)
 
     def __init__(self, img_path):
+        self._exif_data = None
         super(SortImage, self).__init__(img_path)
+
+    def get_exif_data(self):
+        if self._exif_data is None:
+            self._exif_data = SortImage.et.get_metadata(self.img_path)
+        #pprint(self._exif_data)
+        return self._exif_data
         
     def date(self):
         exif_data = self.get_exif_data()
         #;
-        if "DateTimeOriginal" in exif_data:
-            d = datetime.strptime(exif_data['DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
+        if "EXIF:DateTimeOriginal" in exif_data:
+            d = datetime.strptime(exif_data['EXIF:DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
             return d
-        if "DateTime" in exif_data:
-            d = datetime.strptime(exif_data['DateTime'], '%Y:%m:%d %H:%M:%S')
+        if "EXIF:DateTime" in exif_data:
+            d = datetime.strptime(exif_data['EXIF:DateTime'], '%Y:%m:%d %H:%M:%S')
             return d
         pprint(exif_data)
         print("No date found for %s" %(self.path()))
@@ -50,7 +57,7 @@ class SortImage(ImageMetaData):
     def updateid(self):
         m = self.hasid()
         if m is None:
-            m = ImageMetaData.md5(self)
+            m = MetaFile.md5(self)
             p = map(fsencode,["-EXIF:ImageUniqueID+=%s" %(m), self.img_path])
             SortImage.et.execute(*p)
     
@@ -58,6 +65,6 @@ class SortImage(ImageMetaData):
         m = self.hasid()
         if not m is None:
             return m
-        return ImageMetaData.md5(self)
+        return MetaFile.md5(self)
         
         

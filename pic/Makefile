@@ -23,7 +23,7 @@ testhugo:
 	cd test; hugo server -D
 
 prepare:
-	sudo apt-get install exiftools hugo
+	sudo apt-get install exiftool hugo
 
 clean:
 	rm sortpics.db

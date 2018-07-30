@@ -1,5 +1,4 @@
 from PIL import Image
-from sortpics.meta import ImageMetaData
 from sortpics.meta import MetaFile
 from datetime import datetime
 from pprint import pprint
