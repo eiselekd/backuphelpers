@@ -22,6 +22,11 @@ testhugo:
 	done
 	cd test; hugo server -D
 
+server:
+	cd test; hugo
+	cd $(CURDIR)/test/public; python $(CURDIR)/server.py
+
+
 prepare:
 	sudo apt-get install exiftool hugo
 
