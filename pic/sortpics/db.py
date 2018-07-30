@@ -1,5 +1,7 @@
 import sqlite3
 from pprint import pprint
+
+from sortpics.meta import MetaFile
 from sortpics.img import SortImage
 from sortpics.mpg import SortMovie
 from sortpics.other import SortOther
@@ -19,7 +21,7 @@ class picdb(object):
         self.c.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '%s'" %(n))
         (cnt,)=self.c.fetchone()
         if cnt == 0:
-            self.c.execute("CREATE TABLE %s (id integer primary key autoincrement , date DATETIME, path text, md5 text)" %(n))
+            self.c.execute("CREATE TABLE %s (id integer primary key autoincrement , date DATETIME, path text, md5 text, comment text)" %(n))
             self.conn.commit()
         
     def rel(self):
@@ -27,7 +29,7 @@ class picdb(object):
 
     def getDup(self,i,t):
         m = i.md5()
-        self.c.execute("Select (id,path) from %s where (md5=='%s')" %(t,m))
+        self.c.execute("Select id, path from %s where (md5=='%s')" %(t,m))
         r=self.c.fetchall()
         if (len(r) > 0):
             return (r[0][0],r[0][1]);
@@ -43,28 +45,34 @@ class picdb(object):
         return (None,None,None)
     
     def addToTable(self,i):
-        (dup,path,tab) = self.getDup(i,i.table())
+        (dup,path) = self.getDup(i,i.table())
         if dup is None:
-            (d,p,t,m) = (i.date(), i.path(), i.table(),i.md5())
-            self.c.execute(('insert into %s(id,date,path,md5) values (NULL,?,?,?)' %(t)), (d.strftime('%Y-%m-%d %H:%M:%S'), p, m))
+            (d,p,t,m,c) = (i.date(), i.path(), i.table(),i.md5(),i.comment())
+            self.c.execute(('insert into %s(id,date,path,md5,comment) values (NULL,?,?,?,?)' %(t)), (d.strftime('%Y-%m-%d %H:%M:%S'), p, m, c))
             self.conn.commit()
         else:
             print("Already");
+        
     def addImage(self,i):
         self.addToTable(i)
+        print(i.canonicalsuffix())
 
     def addMovie(self,i):
         self.addToTable(i)
+        print(i.canonicalsuffix())
 
     def addOther(self,i):
         self.addToTable(i)
+        print(i.canonicalsuffix())
         
     def addFile(self,fn):
-        f = MetaFile(fn)
-        (i,d) = searchDup(f)
-        if not (searchDup(f) is None):
+        print("Process %s" %(fn))
+        f = classify(fn)
+        (i,d,t) = self.searchDup(f)
+        if not (i is None):
             self.addOther(SortOther(fn,comment=('dup of %s' %(d))))
-        m = classify(fn)
+            return
+        m = f
         if isinstance(m,SortImage):
             self.addImage(m);
         elif isinstance(m,SortMovie):

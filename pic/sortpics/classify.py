@@ -7,9 +7,9 @@ import time, subprocess, re
 
 def classify(path):
     p = subprocess.check_output(['file', path]).decode('utf-8')
-    if re.search('JPEG image data', p):
+    if re.search('JPEG image data', p) and not path.endswith("THM"):
         return SortImage(path);
-    elif re.search('MPG movie', p):
+    elif re.search('Apple QuickTime movie', p):
         return SortMovie(path);
     return SortOther(path)
     
