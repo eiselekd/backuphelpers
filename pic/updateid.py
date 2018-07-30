@@ -27,7 +27,8 @@ with ExifTool() as et:
     m = ""
     for j in [ 'EXIF:ImageUniqueID', 'MakerNotes:ImageUniqueID' ]:
         if j in exif_data:
-            m = exif_data[j]
+            if (len(exif_data[j]) > 16):
+                m = exif_data[j]
     if m == "":
         if (args.update):
             m = md5(f)

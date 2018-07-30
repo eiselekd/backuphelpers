@@ -1,5 +1,5 @@
 test:
-	./sortpics.py add t
+	./sortpics.py add $(HOME)/Pictures
 	sqlite3 sortpics.db  .dump
 
 testhugo:
@@ -11,12 +11,14 @@ testhugo:
 	cp -r hugo-easy-gallery/layouts test/
 	cp -r hugo-easy-gallery/static test/
 	mkdir -p test/static/img
-	cp -r t test/static/img/t
-	cd test; hugo new posts/my-first-post.md;
+	./sortpics.py copy --dest=$(CURDIR)/test/static/img
+	cd test; 
 	cd test; \
-	echo "{{< load-photoswipe >}}" >> content/posts/my-first-post.md; \
 	for d in `cd static; find img -type d`; do \
-		echo "$${d}:{{< gallery dir=\"/$${d}/\" />}}" >> content/posts/my-first-post.md; \
+		f="posts/$$(echo $$d | tr '/' '-').md"; \
+		hugo new $$f; \
+		echo "{{< load-photoswipe >}}" >> content/$$f; \
+		echo "$${d}:{{< gallery dir=\"/$${d}/\" />}}" >> content/$$f; \
 	done
 	cd test; hugo server -D
 
@@ -25,3 +27,5 @@ prepare:
 
 clean:
 	rm sortpics.db
+
+.PHONY: test

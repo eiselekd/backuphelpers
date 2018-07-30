@@ -43,7 +43,8 @@ class SortImage(ImageMetaData):
         exif_data = SortImage.et.get_metadata(self.img_path)
         for j in [ 'EXIF:ImageUniqueID', 'MakerNotes:ImageUniqueID' ]:
             if j in exif_data:
-                return exif_data[j]
+                if (len(exif_data[j]) > 16):
+                    return exif_data[j]
         return None
 
     def updateid(self):

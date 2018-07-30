@@ -66,9 +66,9 @@ class picdb(object):
         print(i.canonicalsuffix())
         
     def addFile(self,fn):
-        print("Process %s" %(fn))
         f = classify(fn)
         (i,d,t) = self.searchDup(f)
+        print("Process %s : %s" %(fn,f.md5()))
         if not (i is None):
             self.addOther(SortOther(fn,comment=('dup of %s' %(d))))
             return
