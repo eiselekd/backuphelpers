@@ -1,5 +1,7 @@
 import sqlite3
 from sortpics.img import SortImage
+from sortpics.mpg import SortMovie
+from sortpics.other import SortOther
 from sortpics.classify import classify
 import subprocess
 

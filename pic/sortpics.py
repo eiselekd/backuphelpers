@@ -13,9 +13,10 @@ db = picdb(db='sortpics.db')
 for dn in args.files:
     if os.path.isdir(dn):
         for r, d, files in os.walk(dn):
-            for f oin files: 
+            for f in files: 
                 ffn = os.path.join(r, f);
                 db.addFile(ffn);
-    else:
+    elif os.path.isfile(dn):
         db.addFile(dn);
-
+    else:
+        raise(Exception("Unknown file/dir %s" %(dn)))

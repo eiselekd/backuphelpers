@@ -2,7 +2,7 @@ from PIL import Image
 from sortpics.meta import ImageMetaData
 from datetime import datetime
 from pprint import pprint
-import time
+import time, os
 
 class SortOther(object):
 
@@ -13,6 +13,8 @@ class SortOther(object):
         
     def path(self):
         return self.img_path
+    def date(self):
+        return datetime.now()
 
     def table(self):
         return 'other';
