@@ -51,8 +51,8 @@ class picdb(object):
             self.c.execute(('insert into %s(id,date,path,md5,comment) values (NULL,?,?,?,?)' %(t)), (d.strftime('%Y-%m-%d %H:%M:%S'), p, m, c))
             self.conn.commit()
         else:
-            print("Already");
-        
+            print("Already present");
+
     def addImage(self,i):
         self.addToTable(i)
         print(i.canonicalsuffix())
@@ -81,3 +81,14 @@ class picdb(object):
             self.addOther(m);
         else:
             raise(Exception("Unknown type"))
+        
+    def pics(self):
+        self.c.execute("SELECT path FROM pics ")
+        r=self.c.fetchall()
+        return [SortImage(x[0]) for x in r ]
+            
+    def movs(self):
+        self.c.execute("SELECT path FROM movies ")
+        r=self.c.fetchall()
+        return [SortMovie(x[0]) for x in r ]
+            

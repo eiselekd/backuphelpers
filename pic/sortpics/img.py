@@ -38,12 +38,25 @@ class SortImage(ImageMetaData):
 
     def table(self):
         return 'pics';
-    
-    def md5(self):
+
+    def hasid(self):
         exif_data = SortImage.et.get_metadata(self.img_path)
         for j in [ 'EXIF:ImageUniqueID', 'MakerNotes:ImageUniqueID' ]:
             if j in exif_data:
                 return exif_data[j]
+        return None
+
+    def updateid(self):
+        m = self.hasid()
+        if m is None:
+            m = ImageMetaData.md5(self)
+            p = map(fsencode,["-EXIF:ImageUniqueID+=%s" %(m), self.img_path])
+            SortImage.et.execute(*p)
+    
+    def md5(self):
+        m = self.hasid()
+        if not m is None:
+            return m
         return ImageMetaData.md5(self)
         
         
