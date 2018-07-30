@@ -1,13 +1,12 @@
 from datetime import datetime
 from pprint import pprint
 import time
+from sortpics.meta import MetaFile
 
-class SortMovie(object):
+class SortMovie(MetaFile):
 
     def __init__(self, img_path):
-        img_path = os.path.abspath(img_path)
-        self.img_path = img_path
-        super(object, self).__init__()
+        super(ImageMetaData, self).__init__(img_path)
         
     def path(self):
         return self.img_path

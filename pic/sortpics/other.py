@@ -1,15 +1,14 @@
 from PIL import Image
 from sortpics.meta import ImageMetaData
+from sortpics.meta import MetaFile
 from datetime import datetime
 from pprint import pprint
 import time, os
 
-class SortOther(object):
+class SortOther(MetaFile):
 
     def __init__(self, img_path):
-        img_path = os.path.abspath(img_path)
-        self.img_path = img_path
-        super(object, self).__init__()
+        super(ImageMetaData, self).__init__(img_path)
         
     def path(self):
         return self.img_path

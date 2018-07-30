@@ -1,4 +1,5 @@
 import sqlite3
+from pprint import pprint
 from sortpics.img import SortImage
 from sortpics.mpg import SortMovie
 from sortpics.other import SortOther
@@ -18,18 +19,37 @@ class picdb(object):
         self.c.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '%s'" %(n))
         (cnt,)=self.c.fetchone()
         if cnt == 0:
-            self.c.execute("CREATE TABLE %s (date DATETIME, path text)" %(n))
+            self.c.execute("CREATE TABLE %s (id integer primary key autoincrement , date DATETIME, path text, md5 text)" %(n))
             self.conn.commit()
         
     def rel(self):
         self.conn.close()
 
-    def addToTable(self,i):
-        (d,p,t) = (i.date(), i.path(), i.table())
-        self.c.execute(('insert into %s values (?,?)' %(t)), (d.strftime('%Y-%m-%d %H:%M:%S'), p))
-        self.conn.commit()
+    def getDup(self,i,t):
+        m = i.md5()
+        self.c.execute("Select (id,path) from %s where (md5=='%s')" %(t,m))
+        r=self.c.fetchall()
+        if (len(r) > 0):
+            return (r[0][0],r[0][1]);
+        return (None,None)
 
-        
+    def searchDup(self,i):
+        (picdup,p) = self.getDup(i, 'pics');
+        if not (picdup is None):
+            return (picdup, p, 'pics')
+        (moviedup,p) = self.getDup(i, 'movies');
+        if not (moviedup is None):
+            return (moviedup, p, 'movies')
+        return (None,None,None)
+    
+    def addToTable(self,i):
+        (dup,path,tab) = self.getDup(i,i.table())
+        if dup is None:
+            (d,p,t,m) = (i.date(), i.path(), i.table(),i.md5())
+            self.c.execute(('insert into %s(id,date,path,md5) values (NULL,?,?,?)' %(t)), (d.strftime('%Y-%m-%d %H:%M:%S'), p, m))
+            self.conn.commit()
+        else:
+            print("Already");
     def addImage(self,i):
         self.addToTable(i)
 
@@ -40,6 +60,10 @@ class picdb(object):
         self.addToTable(i)
         
     def addFile(self,fn):
+        f = MetaFile(fn)
+        (i,d) = searchDup(f)
+        if not (searchDup(f) is None):
+            self.addOther(SortOther(fn,comment=('dup of %s' %(d))))
         m = classify(fn)
         if isinstance(m,SortImage):
             self.addImage(m);

@@ -2,9 +2,24 @@
 
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-import os
+import os, hashlib
 
-class ImageMetaData(object):
+class MetaFile(object):
+    def __init__(self, img_path):
+        img_path = os.path.abspath(img_path)
+        self.img_path = img_path
+        self._md5sum = None 
+    def md5(self):
+        if not (self._md5sum is None):
+            return self._md5sum
+        hash_md5 = hashlib.md5()
+        with open(self.img_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        self._md5sum = hash_md5.hexdigest()
+        return self._md5sum
+    
+class ImageMetaData(MetaFile):
     '''
     Extract the exif data from any image. Data includes GPS coordinates, 
     Focal Length, Manufacture, and more.
@@ -13,11 +28,9 @@ class ImageMetaData(object):
     image = None
 
     def __init__(self, img_path):
-        img_path = os.path.abspath(img_path)
-        self.img_path = img_path
-        self.image = Image.open(img_path)
+        super(ImageMetaData, self).__init__(img_path)
+        self.image = Image.open(self.img_path)
         self.get_exif_data()
-        super(ImageMetaData, self).__init__()
 
     def get_exif_data(self):
         """Returns a dictionary from the exif data of an PIL Image item. Also converts the GPS Tags"""
