@@ -35,9 +35,9 @@ class MetaFile(object):
         p = d.strftime('%Y-%m-%d_%H:%M:%S_')
         b = os.path.basename(self.img_path)
         if (b.startswith(p)):
-            f = d.strftime('%Y-%m-%d/')
+            return (d,d.strftime('%Y-%m-%d'),b)
         else:
-            f = d.strftime('%Y-%m-%d/%Y-%m-%d_%H:%M:%S_')
-        return "%s_%s" %(f,b)
+            r1 = d.strftime('%Y-%m-%d_%H:%M:%S_')
+            return (d,d.strftime('%Y-%m-%d'),"%s%s" %(r1,b))
     
     

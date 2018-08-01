@@ -11,26 +11,47 @@ def copyfunc(args):
     r = db.pics()
     for i in r:
         dest = os.path.abspath(args.dest)
-        d = os.path.join(dest, i.canonicalsuffix())
-        cd = os.path.dirname(d)
+        (d,r0,r1) = i.canonicalsuffix()
+        cd = os.path.join(dest, r0, "photos")
+        ad = os.path.join(dest, r0, "album.yml")
         if not os.path.isdir(cd):
             os.makedirs(cd)
+        if not os.path.exists(ad):
+            f0 = d.strftime('%Y-%m-%dT%H:%M:%S')
+            m = """---
+title:
+album_date:
+properties:
+copyright:
+coverimage:
+creation_time: "%s"
+modification_time: "%s"
+
+photos:
+hashes:
+""" %(f0,f0)
+            with open(ad, 'w') as fh:
+                fh.write(m)
         if args.dryrun == 0:
+            d = os.path.join(cd, r1)
             print ("copy %s->%s" %(i.path(), d))
             shutil.copyfile(i.path(), d)
+            
     
 def listpics(args):
     db = picdb(db='sortpics.db')
     r = db.pics()
     for i in r:
-        print(i.canonicalsuffix())
+        (d,r0,r1) = i.canonicalsuffix()
+        print("/".join((r0,r1)))
     
 
 def listmovs(args):
     db = picdb(db='sortpics.db')
     r = db.movs()
     for i in r:
-        print(i.canonicalsuffix())
+        (d,r0,r1) = i.canonicalsuffix()
+        print("/".join((r0,r1)))
     
 
 def addfunc(args):
