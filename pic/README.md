@@ -1,4 +1,4 @@
-Dependency exiftool
+Dependencies: exiftool, yaml, mako
 
 ```
 setdesc.py    : set/get exif EXIF:ImageDescription for adding commentary text to pictures
