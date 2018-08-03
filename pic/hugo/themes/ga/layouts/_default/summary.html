@@ -1,0 +1,16 @@
+<a href="{{ .Permalink }}">
+    {{$a:=.Site.BaseURL}}
+    <p>{{ .Title }}</p>
+    <div class="albumitem" style="display:block;">
+	{{ range .Params.files }}
+    	<div class="summaryitem">
+	    <div class="rotation-wrapper-outer">
+		<div class="rotation-wrapper-inner">
+		    <img width="100" src="{{$a}}{{ index . 0 }}" class="{{ index . 1 }}">
+		</div>
+	    </div>
+	</div>
+	{{ end }}
+    </div>
+</a>
+<p style="page-break-after: always;">&nbsp;</p>
