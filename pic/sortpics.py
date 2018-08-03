@@ -17,9 +17,10 @@ def copyfunc(args):
         if not os.path.isdir(cd):
             os.makedirs(cd)
         if not os.path.exists(ad):
+            f1 = d.strftime('%Y-%m-%d')
             f0 = d.strftime('%Y-%m-%dT%H:%M:%S')
             m = """---
-title:
+title: %s
 album_date:
 properties:
 copyright:
@@ -29,7 +30,7 @@ modification_time: "%s"
 
 photos:
 hashes:
-""" %(f0,f0)
+""" %(f1,f0,f0)
             with open(ad, 'w') as fh:
                 fh.write(m)
         if args.dryrun == 0:

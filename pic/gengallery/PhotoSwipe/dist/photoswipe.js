@@ -2530,7 +2530,7 @@ var _showOrHideTimeout,
 		// Height is optional, as calculated based on large image.
 		var thumbBounds; 
 		if(item.initialLayout) {
-			thumbBounds = item.initialLayout;
+		        thumbBounds = item.initialLayout;
 			item.initialLayout = null;
 		} else {
 			thumbBounds = _options.getThumbBoundsFn && _options.getThumbBoundsFn(_currentItemIndex);
@@ -2591,10 +2591,20 @@ var _showOrHideTimeout,
 			}
 
 			if(!out) {
-				_currZoomLevel = thumbBounds.w / item.w;
+			    _currZoomLevel = thumbBounds.w / ( ( item.rotation == "rotate-90" ||
+                                                                 item.rotation == "rotate-270") ? item.h : item.w );
+
 				_panOffset.x = thumbBounds.x;
 				_panOffset.y = thumbBounds.y - _initalWindowScrollY;
 
+                            if ( item.rotation == "rotate-90" ||
+                                 item.rotation == "rotate-270") {
+                                var d = Math.abs(thumbBounds.w-thumbBounds.h)/2;
+                                _panOffset.x-=d+0;
+                                _panOffset.y+=d-0;
+                            }
+                            
+                            
 				self[fadeEverything ? 'template' : 'bg'].style.opacity = 0.001;
 				_applyCurrentZoomPan();
 			}
@@ -2642,12 +2652,24 @@ var _showOrHideTimeout,
 				} else {
 
 					// "out" animation uses rAF only when PhotoSwipe is closed by browser scroll, to recalculate position
-					var destZoomLevel = thumbBounds.w / item.w,
-						initialPanOffset = {
-							x: _panOffset.x,
-							y: _panOffset.y
-						},
-						initialZoomLevel = _currZoomLevel,
+				        var destZoomLevel = thumbBounds.w /( ( item.rotation == "rotate-90" ||
+                                                                               item.rotation == "rotate-270") ? item.h : item.w );
+
+
+				    var initialPanOffset = {
+					x: _panOffset.x,
+					y: _panOffset.y
+				    };
+
+                                    if ( item.rotation == "rotate-90" ||
+                                         item.rotation == "rotate-270") {
+                                        var d = Math.abs(thumbBounds.w-thumbBounds.h)/2;
+                                        thumbBounds.x-=d;
+                                        thumbBounds.y+=d;
+                                    };
+                            
+                                            
+				    var 		initialZoomLevel = _currZoomLevel,
 						initalBgOpacity = _bgOpacity,
 						onUpdate = function(now) {
 							
@@ -2842,7 +2864,8 @@ var _getItemAt,
 		item.loading = true;
 		item.loaded = false;
 		var img = item.img = framework.createEl('pswp__img', 'img');
-		var onComplete = function() {
+                framework.addClass(img, item.rotation+"-simple");
+                var onComplete = function() {
 			item.loading = false;
 			item.loaded = true;
 
@@ -2963,8 +2986,8 @@ _registerModule('Controller', {
 				}
 			});
 
-			_listen('initialLayout', function() {
-				self.currItem.initialLayout = _options.getThumbBoundsFn && _options.getThumbBoundsFn(_currentItemIndex);
+		    _listen('initialLayout', function() {
+                        	self.currItem.initialLayout = _options.getThumbBoundsFn && _options.getThumbBoundsFn(_currentItemIndex);
 			});
 
 			_listen('mainScrollAnimComplete', _appendImagesPool);
@@ -3119,12 +3142,25 @@ _registerModule('Controller', {
 
 					var placeholder = framework.createEl(placeholderClassName, item.msrc ? 'img' : '');
 					if(item.msrc) {
-						placeholder.src = item.msrc;
-					}
-					
+					    placeholder.src = item.msrc;
+                                            framework.addClass(placeholder, item.rotation+"-simple");
+
+                                        }
+ 				        //var w = item.w;
+                                        //var h = item.h;
+
+                                        if ( item.rotation == "rotate-90" ||
+                                             item.rotation == "rotate-270") {
+ 				            //item.w = h;
+                                            //item.h = w;
+                                        }
+                                         
 					_setImageSize(item, placeholder);
 
-					baseDiv.appendChild(placeholder);
+ 				        //item.w = w;
+                                        //item.h = h;
+
+                                        baseDiv.appendChild(placeholder);
 					item.placeholder = placeholder;
 
 				}
@@ -3156,7 +3192,10 @@ _registerModule('Controller', {
 				// image object is created every time, due to bugs of image loading & delay when switching images
 				img = framework.createEl('pswp__img', 'img');
 				img.style.opacity = 1;
-				img.src = item.src;
+			    img.src = item.src;
+
+                                framework.addClass(img, item.rotation+"-simple");
+
 				_setImageSize(item, img);
 				_appendImage(index, item, baseDiv, img, true);
 			}
