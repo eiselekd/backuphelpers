@@ -67,6 +67,8 @@ class picdb(object):
         
     def addFile(self,fn):
         f = classify(fn)
+        if isinstance(f,SortOther):
+            return
         (i,d,t) = self.searchDup(f)
         print("Process %s : %s" %(fn,f.md5()))
         if not (i is None):
