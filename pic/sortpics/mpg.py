@@ -20,4 +20,6 @@ class SortMovie(MetaFile):
                     d = datetime.strptime(exif_data[i], '%Y:%m:%d %H:%M:%S')
                     return d
         pprint(exif_data)
-        raise(Exception("Cannot find date for %s" %(self.path())))
+        print("No date found for %s" %(self.path()))
+        return datetime.now()
+        #raise(Exception("Cannot find date for %s" %(self.path())))

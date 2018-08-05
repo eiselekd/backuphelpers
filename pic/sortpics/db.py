@@ -55,15 +55,15 @@ class picdb(object):
 
     def addImage(self,i):
         self.addToTable(i)
-        print(i.canonicalsuffix())
+        #print(i.canonicalsuffix())
 
     def addMovie(self,i):
         self.addToTable(i)
-        print(i.canonicalsuffix())
+        #print(i.canonicalsuffix())
 
     def addOther(self,i):
         self.addToTable(i)
-        print(i.canonicalsuffix())
+        #print(i.canonicalsuffix())
         
     def addFile(self,fn):
         f = classify(fn)
