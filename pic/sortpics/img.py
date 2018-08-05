@@ -28,11 +28,17 @@ class SortImage(MetaFile):
         exif_data = self.get_exif_data()
         #;
         if "EXIF:DateTimeOriginal" in exif_data:
-            d = datetime.strptime(exif_data['EXIF:DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
-            return d
+            try:
+                d = datetime.strptime(exif_data['EXIF:DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
+                return d
+            except:
+                pass
         if "EXIF:DateTime" in exif_data:
-            d = datetime.strptime(exif_data['EXIF:DateTime'], '%Y:%m:%d %H:%M:%S')
-            return d
+            try:
+                d = datetime.strptime(exif_data['EXIF:DateTime'], '%Y:%m:%d %H:%M:%S')
+                return d
+            except:
+                pass
         pprint(exif_data)
         print("No date found for %s" %(self.path()))
         return datetime.now()
