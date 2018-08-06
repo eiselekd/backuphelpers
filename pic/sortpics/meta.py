@@ -32,12 +32,12 @@ class MetaFile(object):
 
     def canonicalsuffix(self):
         d = self.date()
-        p = d.strftime('%Y-%m-%d_%H:%M:%S_')
+        p = d.strftime('%Y-%m-%d_%H_%M_')
         b = os.path.basename(self.img_path)
         if (b.startswith(p)):
-            return (d,d.strftime('%Y-%m-%d'),b)
+            fn = (d,d.strftime('%Y-%m-%d'),b)
         else:
-            r1 = d.strftime('%Y-%m-%d_%H:%M:%S_')
-            return (d,d.strftime('%Y-%m-%d'),"%s%s" %(r1,b))
-    
+            r1 = d.strftime('%Y-%m-%d_%H_%M_')
+            fn = (d,d.strftime('%Y-%m-%d'),"%s%s" %(r1,b))
+        return fn
     
