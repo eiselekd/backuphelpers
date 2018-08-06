@@ -7,10 +7,11 @@ from os.path import expanduser
 home = expanduser("~")
 
 def copyfunc(args):
-    db = picdb(db='sortpics.db')
+    db = picdb(args,db='sortpics.db')
     r = db.pics()
+    dest = os.path.join(db.getbase(),"Pictures")
     for i in r:
-        dest = os.path.abspath(args.dest)
+        dest = os.path.abspath(dest)
         (d,r0,r1) = i.canonicalsuffix()
         cd = os.path.join(dest, r0, "photos")
         ad = os.path.join(dest, r0, "album.yml")
@@ -29,7 +30,7 @@ creation_time: "%s"
 modification_time: "%s"
 
 photos:
-hashes:
+
 """ %(f1,f0,f0)
             with open(ad, 'w') as fh:
                 fh.write(m)
@@ -40,7 +41,7 @@ hashes:
             
     
 def listpics(args):
-    db = picdb(db='sortpics.db')
+    db = picdb(args,db='sortpics.db')
     r = db.pics()
     for i in r:
         (d,r0,r1) = i.canonicalsuffix()
@@ -48,7 +49,7 @@ def listpics(args):
     
 
 def listmovs(args):
-    db = picdb(db='sortpics.db')
+    db = picdb(args,db='sortpics.db')
     r = db.movs()
     for i in r:
         (d,r0,r1) = i.canonicalsuffix()
@@ -57,7 +58,7 @@ def listmovs(args):
 
 def addfunc(args):
     print("addfunc");
-    db = picdb(db='sortpics.db')
+    db = picdb(args,db='sortpics.db')
     for dn in args.files:
         if os.path.isdir(dn):
             for r, d, files in os.walk(dn):
@@ -71,6 +72,8 @@ def addfunc(args):
 
 parser = argparse.ArgumentParser(description='sortpics')
 parser.add_argument('--verbose', '-v', dest='verbose', action='count', default=0)
+parser.add_argument('--sortpic', '-b', dest='sortpic', type=str, default=None)
+
 subparsers = parser.add_subparsers(help='sub-commands help')
 
 # create the parser for the "listpics" command
@@ -88,7 +91,6 @@ parser_add.set_defaults(func=addfunc)
 
 # create the parser for the "copy" command
 parser_add = subparsers.add_parser('copy', help='add help')
-parser_add.add_argument('--dest', '-d', dest='dest', type=str, default=("%s/Pictures"%(home)))
 parser_add.add_argument('--dry-run', '-r', dest='dryrun', action='count', default=0)
 parser_add.set_defaults(func=copyfunc)
 

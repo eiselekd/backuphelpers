@@ -1,6 +1,6 @@
 import sqlite3
 from pprint import pprint
-
+import os
 from sortpics.meta import MetaFile
 from sortpics.img import SortImage
 from sortpics.mpg import SortMovie
@@ -10,13 +10,24 @@ import subprocess
 
 class picdb(object):
     
-    def __init__(self, db='sortpics.db'):
-        self.conn = sqlite3.connect('sortpics.db')
+    def __init__(self, args, db='sortpics.db'):
+        self._args = args
+        self._db = db
+        h = self.getbase()
+        self.conn = sqlite3.connect(os.path.join(h,db))
         self.c = self.conn.cursor()
         self.createTable('pics')
         self.createTable('movies')
         self.createTable('other')
 
+    def getbase(self):
+        h = os.environ.get("SORTPICHOME")
+        if not (self._args.sortpic is None):
+            h = self._args.sortpic 
+        if h is None:
+            h = "."
+        return h
+            
     def createTable(self,n):
         self.c.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '%s'" %(n))
         (cnt,)=self.c.fetchone()
