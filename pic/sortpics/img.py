@@ -26,31 +26,15 @@ class SortImage(MetaFile):
         
     def date(self):
         exif_data = self.get_exif_data()
-        #;
-        if "EXIF:DateTimeOriginal" in exif_data:
-            try:
-                a = exif_data['EXIF:DateTimeOriginal']
-                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
-                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
-                return d
-            except:
-                pass
-        if "EXIF:DateTime" in exif_data:
-            try:
-                a = exif_data['EXIF:DateTime']
-                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
-                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
-                return d
-            except:
-                pass
-        if "File:FileModifyDate" in exif_data:
-            try:
-                a = exif_data['File:FileModifyDate']
-                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
-                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
-                return d
-            except:
-                pass
+        for i in ['EXIF:DateTimeOriginal','EXIF:DateTime','File:FileModifyDate']:
+            if i in exif_data:
+                try:
+                    a = exif_data[i]
+                    a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
+                    d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
+                    return d
+                except Exception as e:
+                    print(str(e))
         pprint(exif_data)
         print("No date found for %s" %(self.path()))
         return datetime.now()
