@@ -81,7 +81,7 @@ class picdb(object):
         if isinstance(f,SortOther):
             return
         (i,d,t) = self.searchDup(f)
-        print("Process %s : %s" %(fn,f.md5()))
+        print("Process %s : %s : %s" %(fn,f.md5(),f.date()))
         if not (i is None):
             self.addOther(SortOther(fn,comment=('dup of %s' %(d))))
             return

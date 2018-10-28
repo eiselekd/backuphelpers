@@ -6,7 +6,10 @@ from pprint import pprint
 import time, subprocess, re
 
 def classify(path):
-    p = subprocess.check_output(['file', path]).decode('utf-8')
+    try:
+        p = subprocess.check_output(['file', path]).decode('utf-8')
+    except Exception as e:
+        return SortOther(path)
     if re.search('JPEG image data', p) and not path.endswith("THM"):
         return SortImage(path);
     elif re.search('Apple QuickTime movie', p):

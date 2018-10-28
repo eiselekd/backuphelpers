@@ -3,7 +3,7 @@ from sortpics.meta import MetaFile
 from datetime import datetime
 from pprint import pprint
 from pyexiftool.exiftool import ExifTool
-import time, atexit
+import time, atexit, re
 
 
 class SortImage(MetaFile):
@@ -29,13 +29,25 @@ class SortImage(MetaFile):
         #;
         if "EXIF:DateTimeOriginal" in exif_data:
             try:
-                d = datetime.strptime(exif_data['EXIF:DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
+                a = exif_data['EXIF:DateTimeOriginal']
+                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
+                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
                 return d
             except:
                 pass
         if "EXIF:DateTime" in exif_data:
             try:
-                d = datetime.strptime(exif_data['EXIF:DateTime'], '%Y:%m:%d %H:%M:%S')
+                a = exif_data['EXIF:DateTime']
+                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
+                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
+                return d
+            except:
+                pass
+        if "File:FileModifyDate" in exif_data:
+            try:
+                a = exif_data['File:FileModifyDate']
+                a = re.sub(r"\+[0-9]+:[0-9]+$","",a);
+                d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
                 return d
             except:
                 pass
