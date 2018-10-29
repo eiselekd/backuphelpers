@@ -13,7 +13,7 @@ def copyfunc(args):
         r = db.movs()
     else:
         r = db.pics()
-    b = db.getbase()
+    b = db.getdestbase()
     dest = b
     hist = os.path.join(b,"history")
     with open(hist, "a") as f:
@@ -125,6 +125,7 @@ parser_add.set_defaults(func=addfunc)
 parser_add = subparsers.add_parser('copy', help='add help')
 parser_add.add_argument('--dry-run', '-r', dest='dryrun', action='count', default=0)
 parser_add.add_argument('--ismovies', '-m', dest='ismovies', action='count', default=0)
+parser_add.add_argument('--dest', '-d', dest='dest', type=str, default=None)
 
 parser_add.set_defaults(func=copyfunc)
 

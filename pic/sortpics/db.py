@@ -27,6 +27,15 @@ class picdb(object):
         if h is None:
             h = "."
         return h
+    
+    def getdestbase(self):
+        h = os.environ.get("SORTPICDEST")
+        if not (self._args.dest is None):
+            h = self._args.dest 
+        if h is None:
+            h = "."
+        return h
+            
             
     def createTable(self,n):
         self.c.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '%s'" %(n))
