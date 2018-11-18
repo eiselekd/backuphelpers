@@ -13,17 +13,22 @@ def copyfunc(args):
         r = db.movs()
     else:
         r = db.pics()
+    copyElem(args, db, r)
+
+def copyElem(args, db, r):
+    ismovies=args.ismovies
     b = db.getdestbase()
     dest = b
     hist = os.path.join(b,"history")
+    da = []
     with open(hist, "a") as f:
         for i in r:
             dest = os.path.abspath(dest)
             (d,r0,r1) = i.canonicalsuffix()
             if ismovies:
-                cd = os.path.join(dest, r0, "movies")
+                cd = os.path.join(dest, r0) #, "movies")
             else:
-                cd = os.path.join(dest, r0, "photos")
+                cd = os.path.join(dest, r0) #, "photos")
             ad = os.path.join(dest, r0, "album.yml")
             if not os.path.isdir(cd):
                 os.makedirs(cd)
@@ -44,23 +49,31 @@ photos:
 """ %(f1,f0,f0)
                 with open(ad, 'w') as fh:
                     fh.write(m)
+            d = os.path.join(cd, r1)
+            da.append(d)
             if args.dryrun == 0:
-                d = os.path.join(cd, r1)
-                if os.path.isfile(d) and (os.path.getsize(d) == os.path.getsize(i.path())):
+                if (args.delafter== 0) and os.path.isfile(d) and (os.path.getsize(d) == os.path.getsize(i.path())):
                     print ("already copied %s->%s" %(i.path(), d))
                 else:
-                    print ("copy %s->%s" %(i.path(), d))
-                    shutil.copyfile(i.path(), d)
-                    f.write("\"%s\" \"%s\"\n" %(i.path(), d))
-            
-    
+                    try:
+                        if (args.delafter == 0):
+                            print ("+copy %s->%s" %(i.path(), d))
+                            shutil.copyfile(i.path(), d)
+                        else:
+                            print ("+move %s->%s" %(i.path(), d))
+                            shutil.move(i.path(), d)
+                        f.write("\"%s\" \"%s\"\n" %(i.path(), d))
+                    except Exception as e:
+                        print("Copy/move exception:"+str(e))
+    return da
+
 def listpics(args):
     db = picdb(args,db='sortpics.db')
     r = db.pics()
     for i in r:
         (d,r0,r1) = i.canonicalsuffix()
         print("/".join((r0,r1)))
-    
+
 
 def listmovs(args):
     db = picdb(args,db='sortpics.db')
@@ -69,7 +82,7 @@ def listmovs(args):
         (d,r0,r1) = i.canonicalsuffix()
         p = i.path()
         print("/".join((r0,r1))+":"+p)
-    
+
 
 def addfunc(args):
     print("addfunc");
@@ -95,7 +108,14 @@ def addfunc(args):
                             #print("Skipping %s" %(ffn))
                             break
                     if not skip:
-                        db.addFile(ffn);
+                        if (args.copy == 1):
+                            i = db.testDup(ffn)
+                            if not (i is None):
+                                if (args.ismovies == 0 and isinstance(i,SortImage)) or ((not (args.ismovies == 0)) and isinstance(i,SortMovie)):
+                                    ra = copyElem(args, db, [i])
+                                    db.addFile(ra[0])
+                        else:
+                            db.addFile(ffn);
         elif os.path.isfile(dn):
             db.addFile(dn);
         else:
@@ -104,6 +124,9 @@ def addfunc(args):
 parser = argparse.ArgumentParser(description='sortpics')
 parser.add_argument('--verbose', '-v', dest='verbose', action='count', default=0)
 parser.add_argument('--sortpic', '-b', dest='sortpic', type=str, default=None)
+parser.add_argument('--ismovies', '-m', dest='ismovies', action='count', default=0)
+parser.add_argument('--dest', '-d', dest='dest', type=str, default=None)
+parser.add_argument('--dry-run', '-r', dest='dryrun', action='count', default=0)
 
 subparsers = parser.add_subparsers(help='sub-commands help')
 
@@ -118,21 +141,15 @@ parser_list.set_defaults(func=listmovs)
 # create the parser for the "add" command
 parser_add = subparsers.add_parser('add', help='add help')
 parser_add.add_argument('--exclude', '-e', dest='exclude', action='count', default="sortpics_exclude.txt")
+parser_add.add_argument('--copy', '-c', dest='copy', action='count', default=0)
+parser_add.add_argument('--delafter', '-D', dest='delafter', action='count', default=0)
 parser_add.add_argument('files', nargs='*', default=[])
 parser_add.set_defaults(func=addfunc)
 
 # create the parser for the "copy" command
 parser_add = subparsers.add_parser('copy', help='add help')
-parser_add.add_argument('--dry-run', '-r', dest='dryrun', action='count', default=0)
-parser_add.add_argument('--ismovies', '-m', dest='ismovies', action='count', default=0)
-parser_add.add_argument('--dest', '-d', dest='dest', type=str, default=None)
 
 parser_add.set_defaults(func=copyfunc)
 
 args = parser.parse_args()
 args.func(args)
-
-
-
-
-    

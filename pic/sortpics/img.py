@@ -34,9 +34,9 @@ class SortImage(MetaFile):
                     d = datetime.strptime(a, '%Y:%m:%d %H:%M:%S')
                     return d
                 except Exception as e:
-                    print(str(e))
+                    print(":"+str(e))
         pprint(exif_data)
-        print("No date found for %s" %(self.path()))
+        print("##############  No date found for %s ########" %(self.path()))
         return datetime.now()
         #ds = d.strftime('%Y-%m-%d %H:%M:%S')
         #n = time.mktime(d.timetuple())

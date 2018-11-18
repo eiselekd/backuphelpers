@@ -11,6 +11,9 @@ class MetaFile(object):
         self.img_path = img_path
         self._md5sum = None
         self._comment = comment
+    def setpath(self,img_path):
+        img_path = os.path.abspath(img_path)
+        self.img_path = img_path
     def md5(self):
         if not (self._md5sum is None):
             return self._md5sum
