@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from sortpics.img import SortImage
+from sortpics.mpg import SortMovie
 from sortpics.db import picdb
 from pprint import pprint
 import argparse, os, shutil, re
